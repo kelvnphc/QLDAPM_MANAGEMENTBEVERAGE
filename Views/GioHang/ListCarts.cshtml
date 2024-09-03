@@ -1,0 +1,159 @@
+﻿@using System.Globalization
+@{
+    ViewData["Title"] = "Giỏ Hàng";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/cart.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* cart.css */
+        .cart-container {
+            font-family: 'Roboto', sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .cart-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .cart-table th, .cart-table td {
+                padding: 10px;
+                text-align: left;
+                border-bottom: 1px solid #ddd;
+            }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .cart-item-image {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        .quantity-input {
+            width: 60px;
+            text-align: center;
+        }
+
+        .btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+
+        .btn-remove {
+            background-color: #dc3545;
+        }
+
+        .btn-checkout {
+            background-color: #28a745;
+        }
+
+        .cart-summary {
+            margin-top: 20px;
+        }
+        /* order-details.css */
+        .order-details-container {
+            font-family: 'Roboto', sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .order-details-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .order-details-table th, .order-details-table td {
+                padding: 10px;
+                text-align: left;
+                border-bottom: 1px solid #ddd;
+            }
+
+        .order-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .order-item-image {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        .order-summary {
+            margin-top: 20px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="cart-container">
+        <h1>@ViewData["Title"]</h1>
+
+        @if (Model.Any())
+        {
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th>Giá</th>
+                        <th>Số lượng</th>
+                        <th>Tổng</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="cart-item">
+                                    <img src="@item.Anh" alt="@item.Ten" class="cart-item-image" />
+                                    <span>@item.Ten</span>
+                                </div>
+                            </td>
+                            <td>@item.Tien</td>
+                            <td>
+                                <input type="number" value="@item.SoLuong" min="1" class="quantity-input" data-product-id="@item.Id" />
+                            </td>
+                            <td>@(item.Tien * item.SoLuong).ToString("C0")</td>
+                            <td>
+                                <form action="@Url.Action("Delete", "GioHang", new { id = item.Id })" method="post">
+                                    <button type="submit" class="btn btn-remove">Xóa</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="cart-summary">
+                <h3>Tổng cộng: @Model</h3>
+                <a href="@Url.Action("Order", "GioHang")" class="btn btn-checkout">Thanh Toán</a>
+            </div>
+        }
+        else
+        {
+            <p>Giỏ hàng của bạn hiện đang trống.</p>
+        }
+    </div>
+
+    <script src="~/js/cart.js"></script>
+</body>
+</html>

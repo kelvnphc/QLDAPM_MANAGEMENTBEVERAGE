@@ -1,0 +1,93 @@
+﻿@model PPKBeverageManagement.Models.KhachHang
+
+@{
+    ViewData["Title"] = "Đăng nhập";
+    Layout = "_Newlayout";
+}
+<body style="background: linear-gradient(to right, #ffafbd, #ffc3a0); margin: 0; padding: 0; height: 100vh; display: block; justify-content: center; align-items: center;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6 col-xl-4">
+                <div class="card shadow-lg border-0 rounded-lg">
+                    <div class="card-body p-5" style="background-color: #fff8e1;">
+                        <h1 class="card-title text-center text-primary mb-4">Đăng Nhập</h1>
+                        <hr />
+                        <form asp-action="DangNhap">
+                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                            <div class="form-group">
+                                <label asp-for="UserName" class="control-label">Tên đăng nhập</label>
+                                <input asp-for="UserName" placeholder="Nhập tên đăng nhập..." class="form-control form-control-lg" />
+                                <span asp-validation-for="UserName" class="text-danger"></span>
+                                <span class="text-danger">@ViewData["Loil"]</span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Pass" class="control-label">Mật khẩu</label>
+                                <input asp-for="Pass" type="password" placeholder="Nhập mật khẩu..." class="form-control form-control-lg" />
+                                <span asp-validation-for="Pass" class="text-danger"></span>
+                                <span class="text-danger">@ViewData["Loi2"]</span>
+                            </div>
+                            <div class="form-group text-center mt-4">
+                                <input type="submit" value="Đăng Nhập" class="btn btn-primary btn-lg btn-block" />
+                            </div>
+                            @if (ViewData["SuccessMessage"] != null)
+                            {
+                                <div class="alert alert-success mt-4" role="alert">
+                                    @ViewData["SuccessMessage"]
+                                </div>
+                            }
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
+    <df-messenger intent="WELCOME"
+                  chat-title="CSKH-PPK-Coffee"
+                  agent-id="66dfadc2-e7dc-4761-9ada-f796b9eabad2"
+                  language-code="vi"></df-messenger>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #ffafbd, #ffc3a0);
+        }
+
+        .card {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+        }
+
+        .card-body {
+            background-color: #fff8e1;
+            border-radius: 15px;
+            padding: 2rem;
+        }
+
+        .card-title {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+
+        .btn-primary {
+            background-color: #ff6f61;
+            border-color: #ff6f61;
+            font-size: 1.25rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+        }
+
+            .btn-primary:hover {
+                background-color: #ff4a3c;
+                border-color: #ff4a3c;
+            }
+
+        .alert {
+            margin-top: 1rem;
+        }
+    </style>
+</body>

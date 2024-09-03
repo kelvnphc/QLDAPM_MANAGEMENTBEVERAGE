@@ -1,0 +1,91 @@
+﻿@model PPKBeverageManagement.Models.KhachHang
+
+@{
+    ViewData["Title"] = "Đăng ký";
+    Layout = "_Newlayout";
+}
+<body style="background-color: #f0f8ff;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card mt-5">
+                    <div class="card-header text-center" style="background-color: #ff6347; color: white;">
+                        <h2>Đăng Ký Tài Khoản</h2>
+                    </div>
+                    <div class="card-body" style="background-color: #fffaf0;">
+                        <form asp-action="DangKy">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="form-group">
+                                <label asp-for="TenKh" class="control-label">Họ và Tên</label>
+                                <input asp-for="TenKh" placeholder="Nhập họ và tên..." class="form-control" />
+                                <span asp-validation-for="TenKh" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="UserName" class="control-label">Tên đăng nhập</label>
+                                <input asp-for="UserName" placeholder="Nhập tên đăng nhập..." class="form-control" />
+                                <span asp-validation-for="UserName" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Pass" class="control-label">Mật khẩu</label>
+                                <input asp-for="Pass" type="password" placeholder="Nhập mật khẩu..." class="form-control" />
+                                <span asp-validation-for="Pass" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="DiaChi" class="control-label">Địa chỉ</label>
+                                <input asp-for="DiaChi" placeholder="Nhập địa chỉ..." class="form-control" />
+                                <span asp-validation-for="DiaChi" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="SoDienThoai" class="control-label">Số điện thoại</label>
+                                <input asp-for="SoDienThoai" placeholder="Nhập số điện thoại..." class="form-control" />
+                                <span asp-validation-for="SoDienThoai" class="text-danger"></span>
+                            </div>
+                            <div class="form-group text-center">
+                                <input type="submit" value="Đăng Ký" class="btn btn-success btn-block" />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        body {
+            background-color: #f0f8ff;
+        }
+
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            font-size: 1.75rem;
+            font-weight: bold;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        .form-control {
+            border-radius: 20px;
+            padding: 10px;
+            font-size: 1rem;
+        }
+
+        .btn-success {
+            background-color: #32cd32;
+            border-color: #32cd32;
+            border-radius: 20px;
+            font-size: 1.2rem;
+            padding: 10px;
+        }
+
+            .btn-success:hover {
+                background-color: #228b22;
+                border-color: #228b22;
+            }
+    </style>
+</body>
