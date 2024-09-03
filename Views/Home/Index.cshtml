@@ -1,0 +1,93 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+    ViewData["ShowFooter"] = true; // Disable footer for this page
+
+}
+<body>
+    <div class="explore-section">
+        <div class="explore-image">
+            <img src="./images/cf.jpg" alt="Coffee" class="explore-img">
+        </div>
+        <div class="explore-text">
+            <h2>Khám phá ngay</h2>
+            <p>Thưởng thức hương vị cà phê tuyệt vời tại quán của chúng tôi.</p>
+            <button class="explore-button">Tìm hiểu thêm</button>
+        </div>
+    </div>
+
+    <style>
+        /* General Reset */
+        * {
+            box-sizing: border-box; /* Ensures padding and border are included in element's total width and height */
+            margin: 0;
+            padding: 0;
+        }
+
+        .explore-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: center;
+            padding: 40px 20px;
+            transition: background-color 0.3s;
+        }
+
+        .explore-image {
+            text-align: center;
+        }
+
+        .explore-img {
+            width: 100%;
+            max-width: 500px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .explore-text {
+            text-align: left;
+            padding: 20px;
+        }
+
+            .explore-text h2 {
+                font-size: 2rem;
+                color: #ff6f00;
+                margin-bottom: 15px;
+            }
+
+            .explore-text p {
+                font-size: 1.2rem;
+                color: #333;
+                margin-bottom: 20px;
+            }
+
+        .explore-button {
+            padding: 10px 20px;
+            background-color: #ff6f00;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+            .explore-button:hover {
+                background-color: #ff8c00;
+                transform: scale(1.05);
+            }
+
+
+        .explore-img:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        /* Ensure the container does not affect the slide */
+        .container {
+            margin: 0;
+            padding: 0; /* Remove padding to avoid affecting layout */
+            width: 100%;
+        }
+
+    </style>
+    <!-- End auto Slide -->
+</body>
