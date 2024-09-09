@@ -13,26 +13,28 @@ using CloudinaryDotNet;
 using System.IO;
 using CloudinaryDotNet.Actions;
 using Microsoft.Extensions.Configuration;
-
 using Microsoft.Extensions.Logging;
 using PPKBeverageManagement.Extensions;
+using PPKBeverageManagement.PAYPAL;
 
 namespace PPKBeverageManagement.Controllers
 {
     public class GioHangController : Controller
     {
-        private readonly IConfiguration _configuration;
+		private readonly IConfiguration _configuration;
+	
+		private readonly IPayPalService _payPalService;
+		private readonly ILogger<GioHangController> _logger;
+		public GioHangController(IConfiguration configuration, IHttpContextAccessor httpContextAccessor,  IPayPalService payPalService, ILogger<GioHangController> logger)
+		{
+			_configuration = configuration;
+			_httpContextAccessor = httpContextAccessor;
+			_payPalService = payPalService;
+			_logger = logger;
+		}
 
-        private readonly ILogger<GioHangController> _logger;
-        public GioHangController(IConfiguration configuration, IHttpContextAccessor httpContextAccessor, ILogger<GioHangController> logger)
-        {
-            _configuration = configuration;
-            _httpContextAccessor = httpContextAccessor;
-            _logger = logger;
-        }
 
-
-        QUANLYCAPHEContext da = new QUANLYCAPHEContext();
+		QUANLYCAPHEContext da = new QUANLYCAPHEContext();
 
         public readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -180,10 +182,97 @@ namespace PPKBeverageManagement.Controllers
 
             return View(viewModel);
         }
-       
+
+		public async Task<IActionResult> ThanhToanPayPal(int orID)
+		{
+
+			var tongTienString = _httpContextAccessor.HttpContext.Session.GetString("TongTien");
+			double tongTien = Double.Parse(tongTienString);
+
+			ViewBag.TongTien = tongTienString;
+			var nameH = _httpContextAccessor.HttpContext.Session.GetString("HoKh");
+			var name = _httpContextAccessor.HttpContext.Session.GetString("TenKh");
+			var fullName = nameH + name;
+			PaymentInformationModel model = new PaymentInformationModel
+			{
+				OrderType = "Thanh toan tien caphe",
+				Amount = tongTien,
+				OrderDescription = String.Format("Hoa don thanh toan online"),
+				Name = fullName
+			};
+			var url = await _payPalService.CreatePaymentUrl(model);
+			return Redirect(url);
+		}
+
+		public async Task<IActionResult> PaymentCallback()
+		{
+			var paymentInfo = _payPalService.PaymentExecute(Request.Query);
+
+			// Trích xuất các giá trị từ kết quả trả về
+			string payment_method = paymentInfo.PaymentMethod;
+			string success = paymentInfo.Success.ToString();
+			string orderId = paymentInfo.OrderId;
+			string paymentId = paymentInfo.PaymentId;
+			string token = Request.Query["token"];
+			string payerId = paymentInfo.PayerId;
+			string url = "https://localhost:44336/NguoiDung/PaymentCallback";
+
+			_logger.LogInformation("PaymentCallback called with success: {successString}", success);
+
+			if (paymentInfo.Success && !string.IsNullOrEmpty(paymentId) && !string.IsNullOrEmpty(payerId))
+			{
+				var executedPayment = await _payPalService.ExecutePayment(paymentId, payerId);
+				if (executedPayment != null && executedPayment.State == "approved")
+				{
+					_logger.LogInformation("Payment was successful.");
+					DonHang o = new DonHang();
+					ViewData["SuccessMessage"] = _httpContextAccessor.HttpContext.Session.GetString("SuccessMessage");
+					var MaKH = _httpContextAccessor.HttpContext.Session.GetInt32("MaKh");
+					o.KhachHangId = MaKH;
+					o.NgayTao = DateTime.Now;
+					o.PayPalKey = url + "&" + "payment_method=" + payment_method + "&" + "success=" + success + "&" + "order_id=" + orderId + "&" + "paymentId=" + paymentId + "&" + "token=" + token + "&" + "PayerID=" + payerId;
+					da.DonHangs.Add(o);
+					da.SaveChanges();
+					int id = o.Id;
+
+					// Thêm
+					List<GioHang> gh = GetListCarts();
+					// Duyệt giỏ hàng thêm vào db
+					foreach (var item in gh)
+					{
+						// Tạo mới ChiTietDonHang
+						ChiTietDonHang odd = new ChiTietDonHang();
+						// Thiết lập các thuộc tính
+						odd.DonHangId = o.Id;
+						odd.SanPhamId = item.Id;
+						odd.SoLuong = item.SoLuong;
+						odd.Tien = item.Tien;
+						odd.KhuyenMaiId = 1;
+						da.ChiTietDonHangs.Add(odd);
+					}
+					da.SaveChanges();
+					_httpContextAccessor.HttpContext.Session.SetObjectAsJson("GioHang", gh);
+					// Làm rỗng giỏ hàng
+					HttpContext.Session.Remove("GioHang");
+					ViewBag.OrderId = id;
+					ViewBag.TongTien = _httpContextAccessor.HttpContext.Session.GetString("TongTien");
+					return View("PaymentSuccess");
+				}
+				else
+				{
+					_logger.LogWarning("Payment failed or was not approved.");
+					return View("PaymentFailure");
+				}
+			}
+			else
+			{
+				_logger.LogWarning("Payment failed or success parameter is missing/invalid.");
+				return View("PaymentFailure");
+			}
+		}
 
 
-        public IActionResult PaymentSuccess()
+		public IActionResult PaymentSuccess()
         {
             return View();
         }

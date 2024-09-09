@@ -6,6 +6,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using PPKBeverageManagement.Models;
 using System.Linq;
+using PPKBeverageManagement.Extensions;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 namespace PPKBeverageManagement.Controllers
 {
     public class KhachHangController : Controller
@@ -17,14 +20,66 @@ namespace PPKBeverageManagement.Controllers
         {
             _httpContextAccessor = httpContextAccessor;
         }
-        // GET: KhachHangController
-        public ActionResult Index()
-        {
-            return View();
-        }
+		// GET: KhachHangController
+		public ActionResult ListBeverage(string? kw, string? page, string? size, int? gia)
+		{
+			string check = _httpContextAccessor.HttpContext.Session.GetString("UserName");
+			if (check != null)
+			{
+				ViewData["SuccessMessage"] = _httpContextAccessor.HttpContext.Session.GetString("SuccessMessage");
 
-        // GET: KhachHangController/Details/5
-        public ActionResult Details(int id)
+				// Lấy tên người dùng từ session
+				var nameH = _httpContextAccessor.HttpContext.Session.GetString("HoKh");
+				var name = _httpContextAccessor.HttpContext.Session.GetString("TenKh");
+
+				if (!string.IsNullOrEmpty(nameH) && !string.IsNullOrEmpty(name))
+				{
+					ViewData["FullName"] = $"{nameH} {name}";
+				}
+				else
+				{
+					ViewData["FullName"] = "Khách hàng";
+				}
+
+				// Xóa thông báo từ session
+				var ds = da.SanPhams.Include(c => c.Size).ToList();
+				_httpContextAccessor.HttpContext.Session.Remove("SuccessMessage");
+				if (!string.IsNullOrEmpty(kw))
+				{
+					ds = ds.Where(s => s.Ten.Contains(kw)).ToList();
+				}
+				if (!string.IsNullOrEmpty(size))
+				{
+					int sizeid = int.Parse(size);
+					ds = ds.Where(s => s.SizeId == sizeid).ToList();
+				}
+				if (gia != null)
+				{
+					ds = ds.Where(s => s.Tien <= (decimal)gia).ToList();
+				}
+				int pageSize = 4;
+				if (!string.IsNullOrEmpty(page))
+				{
+					int pageNumber = int.Parse(page);
+
+					ds = da.SanPhams
+							  .OrderBy(item => item.Id)
+							  .Skip((pageNumber - 1) * pageSize)//Lấy từ vị trí
+							  .Take(pageSize)//Lấy bao nhiêu
+							  .ToList();
+				}
+
+				return View(ds);
+			}
+			else
+				return RedirectToAction("DangNhap");
+
+
+
+		}
+
+		// GET: KhachHangController/Details/5
+		public ActionResult Details(int id)
         {
             return View();
         }
@@ -197,5 +252,17 @@ namespace PPKBeverageManagement.Controllers
             }
             return View();
         }
-    }
+		public List<GioHang> GetListCarts()
+		{
+			List<GioHang> carts = _httpContextAccessor.HttpContext.Session.GetObjectFromJson<List<GioHang>>("GioHang");
+
+			//Chưa có thì tạo mới giỏ hàng trống
+			if (carts == null)
+			{
+				carts = new List<GioHang>();
+			}
+			//Có rồi thì lấy các sp trả về
+			return carts;
+		}
+	}
 }

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using PPKBeverageManagement.PAYPAL;
 using System;
 
 namespace PPKBeverageManagement
@@ -37,16 +38,18 @@ namespace PPKBeverageManagement
             });
             services.AddSignalR();
 
-            services.AddSession(options =>
-            {
-                options.IdleTimeout = TimeSpan.FromMinutes(30); // Thời gian chờ của session
-                options.Cookie.HttpOnly = true;
-                options.Cookie.IsEssential = true;
-            });
-            services.AddControllersWithViews();
-
-            // Đăng ký IHttpContextAccessor
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+			services.AddSession(options =>
+			{
+				options.IdleTimeout = TimeSpan.FromMinutes(30); // Thời gian chờ của session
+				options.Cookie.HttpOnly = true;
+				options.Cookie.IsEssential = true;
+			});
+			services.AddHttpContextAccessor();
+			services.AddControllersWithViews();
+			services.AddSingleton(Configuration);
+			services.AddSingleton<IPayPalService, PayPalService>();
+			// Đăng ký IHttpContextAccessor
+			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton(Configuration);
             services.AddLogging(); // Thêm dịch vụ logging
                                    //services.AddScoped<IOtpService, OtpService>();
