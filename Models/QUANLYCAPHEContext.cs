@@ -16,7 +16,7 @@ namespace PPKBeverageManagement.Models
             : base(options)
         {
         }
-
+        public virtual DbSet<SanPham> SanPham { get; set; }
         public virtual DbSet<ChiTietDonHang> ChiTietDonHangs { get; set; }
         public virtual DbSet<DonHang> DonHangs { get; set; }
         public virtual DbSet<KhachHang> KhachHangs { get; set; }
