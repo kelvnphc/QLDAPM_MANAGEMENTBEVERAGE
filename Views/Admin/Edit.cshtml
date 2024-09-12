@@ -1,0 +1,66 @@
+﻿@model PPKBeverageManagement.Models.SanPham
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "_AdminLayout";
+
+}
+
+<h1>Edit</h1>
+
+<h4>SanPham</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="Anh" class="control-label">Ảnh</label>
+                <div class="mb-3">
+                    <img src="@Model.Anh" alt="Ảnh" class="img-fluid rounded shadow-sm" width="200px" />
+                </div>
+                <input type="file" name="Anh" asp-for="Anh" class="form-control" />
+                <span asp-validation-for="Anh" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Ten" class="control-label"></label>
+                <input asp-for="Ten" class="form-control" />
+                <span asp-validation-for="Ten" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MieuTa" class="control-label"></label>
+                <input asp-for="MieuTa" class="form-control" />
+                <span asp-validation-for="MieuTa" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SizeId" class="control-label"></label>
+                <select asp-for="SizeId" class="form-control" asp-items="@(ViewData["Sizes"] as SelectList)"></select>
+                <span asp-validation-for="SizeId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Tien" class="control-label"></label>
+                <input asp-for="Tien" class="form-control" />
+                <span asp-validation-for="Tien" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LoaiId" class="control-label"></label>
+                <select asp-for="LoaiId" class="form-control" asp-items="@(ViewData["Loais"] as SelectList)"></select>
+                <span asp-validation-for="LoaiId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

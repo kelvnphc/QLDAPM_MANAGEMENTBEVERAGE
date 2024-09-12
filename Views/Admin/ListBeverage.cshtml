@@ -1,0 +1,103 @@
+﻿@model IEnumerable<PPKBeverageManagement.Models.SanPham>
+
+@{
+    ViewData["Title"] = "ListBeverage";
+    Layout = "_AdminLayout";
+
+}
+
+<h1>ListBeverage</h1>
+<form class="mb-4 form-inline" asp-action="ListBeverage" method="get">
+    <div class="form-row align-items-end">
+        <div class="col-md-3">
+            <label for="filter1">Lọc theo tên:</label>
+            <input type="text" id="filter1" name="kw" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <label for="filter2">Lọc theo size:</label>
+            <select id="filter2" name="size" class="form-control">
+                <option value="1">Nhỏ</option>
+                <option value="2">Vừa</option>
+                <option value="3">Lớn</option>
+                <option value="4">Nóng</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="filter3">Lọc theo giá:</label>
+            <input type="number" id="filter3" name="gia" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary btn-block">Lọc</button>
+        </div>
+    </div>
+</form>
+<ul class="pagination justify-content-center mb-4">
+    <li class="page-item"><a class="page-link" href="/Admin/ListBeverage?page=1">1</a></li>
+    <li class="page-item"><a class="page-link" href="/Admin/ListBeverage?page=2">2</a></li>
+    <li class="page-item"><a class="page-link" href="/Admin/ListBeverage?page=3">3</a></li>
+    <li class="page-item"><a class="page-link" href="/Admin/ListBeverage?page=4">4</a></li>
+    <li class="page-item"><a class="page-link" href="/Admin/ListBeverage?page=5">5</a></li>
+    <li class="page-item"><a class="page-link" href="/Admin/ListBeverage?page=6">6</a></li>
+    <li class="page-item"><a class="page-link" href="/Admin/ListBeverage?page=7">7</a></li>
+</ul>
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Anh)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Ten)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MieuTa)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Tien)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Loai)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Size)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <img src="@Html.DisplayFor(modelItem => item.Anh)" width="200px" />
+
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Ten)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.MieuTa)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Tien)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Loai.TenLoai)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Size.Ten)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
