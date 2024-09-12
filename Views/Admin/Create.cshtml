@@ -1,0 +1,61 @@
+﻿@model PPKBeverageManagement.Models.SanPham
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "_AdminLayout";
+
+}
+
+<h1>Create</h1>
+
+<h4>SanPham</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Anh" class="control-label">Ảnh</label>
+                <input type="file" name="Anh" asp-for="Anh" class="form-control" />
+                <span asp-validation-for="Anh" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Ten" class="control-label">Tên</label>
+                <input asp-for="Ten" class="form-control" />
+                <span asp-validation-for="Ten" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MieuTa" class="control-label">Miêu tả</label>
+                <input asp-for="MieuTa" class="form-control" />
+                <span asp-validation-for="MieuTa" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SizeId" class="control-label">Size</label>
+                <select asp-for="SizeId" class="form-control" asp-items="@(ViewData["Sizes"] as SelectList)"></select>
+                <span asp-validation-for="SizeId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Tien" class="control-label">Tiền</label>
+                <input asp-for="Tien" class="form-control" />
+                <span asp-validation-for="Tien" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LoaiId" class="control-label">Loại</label>
+                <select asp-for="LoaiId" class="form-control" asp-items="@(ViewData["Loais"] as SelectList)"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
