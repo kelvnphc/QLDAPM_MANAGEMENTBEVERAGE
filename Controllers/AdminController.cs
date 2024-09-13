@@ -302,8 +302,31 @@ namespace PPKBeverageManagement.Controllers
                 return View();
             }
         }
+        public ActionResult ListOrders()
+        {
+            var query = da.DonHangs.ToList(); ;
+            return View(query);
+        }
+
+        public ActionResult GetOrders(int id) 
+        { 
+            var query = da.DonHangs.Where(c => c.Id == id);
+            return View(query);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteOrder(int id)
+        {
+            var query = da.DonHangs.FirstOrDefault(s => s.Id == id );
+            da.DonHangs.Remove(query);
+            da.SaveChanges();
+            return RedirectToAction("ListBeverage");
+        }
 
 
-       
+
+
+
+
     }
 }
