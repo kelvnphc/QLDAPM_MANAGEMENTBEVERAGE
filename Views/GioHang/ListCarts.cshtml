@@ -1,160 +1,354 @@
-﻿@model List<PPKBeverageManagement.Models.GioHang>
-@using System.Globalization
+﻿@model IEnumerable<PPKBeverageManagement.Models.GioHang>
+
 @{
-    ViewData["Title"] = "Giỏ Hàng";
+    ViewData["Title"] = "Danh sách đơn hàng";
+    Layout = "_Layout";
 }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewData["Title"]</title>
-    <link rel="stylesheet" href="~/css/cart.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        /* cart.css */
-        .cart-container {
-            font-family: 'Roboto', sans-serif;
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .cart-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-            .cart-table th, .cart-table td {
-                padding: 10px;
-                text-align: left;
-                border-bottom: 1px solid #ddd;
-            }
-
-        .cart-item {
-            display: flex;
-            align-items: center;
-        }
-
-        .cart-item-image {
-            width: 50px;
-            height: 50px;
-            margin-right: 10px;
-        }
-
-        .quantity-input {
-            width: 60px;
-            text-align: center;
-        }
-
-        .btn {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            cursor: pointer;
-        }
-
-        .btn-remove {
-            background-color: #dc3545;
-        }
-
-        .btn-checkout {
-            background-color: #28a745;
-        }
-
-        .cart-summary {
-            margin-top: 20px;
-        }
-        /* order-details.css */
-        .order-details-container {
-            font-family: 'Roboto', sans-serif;
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .order-details-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-            .order-details-table th, .order-details-table td {
-                padding: 10px;
-                text-align: left;
-                border-bottom: 1px solid #ddd;
-            }
-
-        .order-item {
-            display: flex;
-            align-items: center;
-        }
-
-        .order-item-image {
-            width: 50px;
-            height: 50px;
-            margin-right: 10px;
-        }
-
-        .order-summary {
-            margin-top: 20px;
-        }
-
-    </style>
-</head>
-<body>
-    <div class="cart-container">
-        <h1>@ViewData["Title"]</h1>
-
-        @if (Model.Any())
-        {
-            <table class="cart-table">
-                <thead>
-                    <tr>
-                        <th>Sản phẩm</th>
-                        <th>Giá</th>
-                        <th>Số lượng</th>
-                        <th>Tổng</th>
-                        <th>Hành động</th>
+<div class="container mt-5">
+    <h1 class="text-center my-4">CHÀO MỪNG @ViewData["FullName"] ĐẾN VỚI TRANG GIỎ HÀNG</h1>
+    <div class="cart-table">
+        <table class="table table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th>Ảnh</th>
+                    <th>Tên cà phê</th>
+                    <th>Size</th>
+                    <th>Giá tiền</th>
+                    <th>Số lượng</th>
+                    <th>Tổng tiền</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr data-item-id="@item.Id">
+                        <td><img width="100px" src="@Html.DisplayFor(modelItem => item.Anh)" class="img-fluid rounded shadow-sm" /></td>
+                        <td>@Html.DisplayFor(modelItem => item.Ten)</td>
+                        <td>@Html.DisplayFor(modelItem => item.TenSize)</td>
+                        <td class="price">@Html.DisplayFor(modelItem => item.Tien)</td>
+                        <td>
+                            <div class="quantity-controls">
+                                <button class="btn btn-outline-secondary adjust-quantity" data-action="decrease">-</button>
+                                <input type="text" class="form-control quantity-input" value="@item.SoLuong" readonly />
+                                <button class="btn btn-outline-secondary adjust-quantity" data-action="increase">+</button>
+                            </div>
+                        </td>
+                        <td class="total">@Html.DisplayFor(modelItem => item.TongTien)</td>
+                        <td>
+                            @Html.ActionLink("Xóa", "Delete", new { id = item.Id }, new { @class = "btn btn-danger btn-sm delete-item" })
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td>
-                                <div class="cart-item">
-                                    <img src="@item.Anh" alt="@item.Ten" class="cart-item-image" />
-                                    <span>@item.Ten</span>
-                                </div>
-                            </td>
-                            <td>@item.Tien</td>
-                            <td>
-                                <input type="number" value="@item.SoLuong" min="1" class="quantity-input" data-product-id="@item.Id" />
-                            </td>
-                            <td>@(item.Tien * item.SoLuong).ToString("C0")</td>
-                            <td>
-                                <form action="@Url.Action("Delete", "GioHang", new { id = item.Id })" method="post">
-                                    <button type="submit" class="btn btn-remove">Xóa</button>
-                                </form>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-
-            <div class="cart-summary">
-                <h3>Tổng cộng: @Model</h3>
-                <a href="@Url.Action("Order", "GioHang")" class="btn btn-checkout">Thanh Toán</a>
-            </div>
-        }
-        else
-        {
-            <p>Giỏ hàng của bạn hiện đang trống.</p>
-        }
+                }
+                <tr class="summary">
+                    <td colspan="3"><strong>Số lượng sản phẩm:</strong> @ViewBag.CountProduct</td>
+                    <td colspan="2"><strong>Thành tiền:</strong> @ViewBag.Total</td>
+                    <td colspan="3">
+                        <div class="btn-group">
+                            @Html.ActionLink("Thanh toán tại chỗ", "Order", "GioHang", null, new { @class = "btn btn-warning btn-sm" })
+                            @Html.ActionLink("Thanh toán PayPal", "ThanhToanPayPal", "GioHang", null, new { @class = "btn btn-primary btn-sm" })
+                            @Html.ActionLink("Quay lại", "ListBeverage", "KhachHang", null, new { @class = "btn btn-info btn-sm" })
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
+    <!-- Scroll to Top Button -->
+    <button id="scrollToTop" class="scroll-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
 
-    <script src="~/js/cart.js"></script>
-</body>
-</html>
+</div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const quantityControls = document.querySelectorAll(".quantity-controls");
+        quantityControls.forEach(control => {
+            const decreaseButton = control.querySelector("[data-action='decrease']");
+            const increaseButton = control.querySelector("[data-action='increase']");
+            const quantityInput = control.querySelector(".quantity-input");
+            const row = control.closest("tr");
+            const priceElement = row.querySelector(".price");
+            const totalElement = row.querySelector(".total");
+
+            decreaseButton.addEventListener("click", () => {
+                let quantity = parseInt(quantityInput.value);
+                if (quantity > 1) {
+                    quantity--;
+                    updateQuantity(row, quantity);
+                }
+            });
+
+            increaseButton.addEventListener("click", () => {
+                let quantity = parseInt(quantityInput.value);
+                quantity++;
+                updateQuantity(row, quantity);
+            });
+
+            function updateQuantity(row, quantity) {
+                quantityInput.value = quantity;
+
+                const price = parseFloat(priceElement.textContent.replace(/[^0-9.-]+/g, ""));
+                const total = price * quantity;
+                totalElement.textContent = total.toFixed(2);
+
+                updateOverallTotal();
+
+                const itemId = row.getAttribute("data-item-id");
+                const requestData = {
+                    itemId: parseInt(itemId),
+                    quantity: parseInt(quantity),
+                };
+
+                fetch('/GioHang/UpdateQuantityAsync', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            console.log('Quantity updated successfully');
+                        } else {
+                            console.error('Failed to update quantity:', data.message);
+                        }
+                    })
+                    .catch(error => console.error('Fetch error:', error));
+            }
+
+            function updateOverallTotal() {
+                let overallTotal = 0;
+                let overallQuantity = 0;
+
+                document.querySelectorAll("tbody tr").forEach(row => {
+                    const totalElement = row.querySelector(".total");
+                    const quantityInput = row.querySelector(".quantity-input");
+
+                    if (totalElement && quantityInput) {
+                        overallTotal += parseFloat(totalElement.textContent.replace(/[^0-9.-]+/g, ""));
+                        overallQuantity += parseInt(quantityInput.value);
+                    }
+                });
+
+                document.querySelector(".summary").querySelector("td:nth-child(1)").innerHTML = `<strong>Số lượng sản phẩm: </strong> ${overallQuantity}`;
+                document.querySelector(".summary").querySelector("td:nth-child(2)").innerHTML = `<strong>Thành tiền: </strong> ${overallTotal.toFixed(2)}`;
+            }
+        });
+
+        // Additional JavaScript for buttons, confirmation, and scroll to top
+
+        // Hover effects for buttons
+        const buttons = document.querySelectorAll(".btn");
+        buttons.forEach(button => {
+            button.addEventListener("mouseenter", () => {
+                button.style.transform = "scale(1.05)";
+                button.style.boxShadow = "0 6px 12px rgba(0, 0, 0, 0.2)";
+            });
+
+            button.addEventListener("mouseleave", () => {
+                button.style.transform = "scale(1)";
+                button.style.boxShadow = "none";
+            });
+        });
+
+        // Confirmation before deleting an item
+        const deleteButtons = document.querySelectorAll(".delete-item");
+        deleteButtons.forEach(button => {
+            button.addEventListener("click", function (event) {
+                if (!confirm("Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?")) {
+                    event.preventDefault();
+                }
+            });
+        });
+
+        // Smooth scroll to top
+        document.querySelector("#scrollToTop").addEventListener("click", function () {
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+        });
+    });
+
+</script>
+
+<style>
+
+    body {
+        background-color: #f8f9fa;
+        color: #343a40;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    .container {
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        color: #343a40;
+        font-size: 2rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-weight: 700;
+    }
+
+    .table {
+        width: 100%;
+        margin-bottom: 1rem;
+        background-color: #fff;
+    }
+    /* Scroll to Top Button */
+    .scroll-to-top {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #3498db;
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+        z-index: 2000;
+    }
+
+        .scroll-to-top:hover {
+            background-color: #2980b9;
+            transform: scale(1.1);
+        }
+
+        .scroll-to-top i {
+            font-size: 24px;
+        }
+
+    .thead-light th {
+        background-color: #e9ecef;
+        color: #495057;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+        padding: 15px;
+        font-weight: 500;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f1f3f5;
+    }
+
+    td, th {
+        vertical-align: middle;
+        text-align: center;
+        padding: 15px;
+    }
+
+    .quantity-controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .quantity-controls .btn {
+            margin: 0;
+            padding: 5px 10px;
+            font-size: 1rem;
+        }
+
+    .quantity-input {
+        width: 60px;
+        text-align: center;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        padding: 5px;
+        margin: 0 5px;
+    }
+
+    .btn-group {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 20px;
+    }
+
+    .btn {
+        margin: 5px;
+        padding: 10px 20px;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: #fff;
+        border: none;
+    }
+
+    .btn-warning {
+        background-color: #f39c12;
+        border-color: #f39c12;
+    }
+
+    .btn-primary {
+        background-color: #2980b9;
+        border-color: #2980b9;
+    }
+
+    .btn-info {
+        background-color: #3498db;
+        border-color: #3498db;
+    }
+
+    .btn-warning:hover {
+        background-color: #e67e22;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        transform: scale(1.05);
+    }
+
+    .btn-primary:hover {
+        background-color: #1c5987;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        transform: scale(1.05);
+    }
+
+    .btn-info:hover {
+        background-color: #2980b9;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        transform: scale(1.05);
+    }
+
+    .btn::before {
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        margin-right: 8px;
+    }
+
+    .btn-warning::before {
+        content: "\f07a"; /* FontAwesome icon for shopping bag */
+    }
+
+    .btn-primary::before {
+        content: "\f154"; /* FontAwesome icon for credit card */
+    }
+
+    .btn-info::before {
+        content: "\f021"; /* FontAwesome icon for arrow-circle-left */
+    }
+    /* Add icons to the buttons */
+
+    img {
+        border-radius: 8px;
+    }
+</style>

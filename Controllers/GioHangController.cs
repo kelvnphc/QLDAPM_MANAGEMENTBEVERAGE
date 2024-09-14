@@ -271,8 +271,7 @@ namespace PPKBeverageManagement.Controllers
 			}
 		}
 
-
-		public IActionResult PaymentSuccess()
+        public IActionResult PaymentSuccess()
         {
             return View();
         }
