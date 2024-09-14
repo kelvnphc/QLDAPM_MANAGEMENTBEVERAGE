@@ -1,4 +1,3 @@
-﻿using CloudinaryDotNet.Actions;
 using CloudinaryDotNet;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,8 +8,11 @@ using PPKBeverageManagement.Models;
 using System.IO;
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 using PPKBeverageManagement.ViewModels;
+using System.Threading.Tasks;
+using PPKBeverageManagement.Extensions;
+using System.Collections.Generic;
+
 
 namespace PPKBeverageManagement.Controllers
 {
@@ -304,26 +306,6 @@ namespace PPKBeverageManagement.Controllers
                 return View();
             }
         }
-        public ActionResult ListOrders()
-        {
-            var query = da.DonHangs.ToList(); ;
-            return View(query);
-        }
-
-        public ActionResult GetOrders(int id) 
-        { 
-            var query = da.DonHangs.Where(c => c.Id == id);
-            return View(query);
-        }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteOrder(int id)
-        {
-            var query = da.DonHangs.FirstOrDefault(s => s.Id == id );
-            da.DonHangs.Remove(query);
-            da.SaveChanges();
-            return RedirectToAction("ListBeverage");
-        }
 
         public ActionResult ListDonHang(string? page)
         {
@@ -461,12 +443,7 @@ namespace PPKBeverageManagement.Controllers
                 return View();
             }
         }
-
-
-
-
-
-
+        
 
     }
 }
