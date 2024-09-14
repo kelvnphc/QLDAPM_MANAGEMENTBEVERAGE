@@ -9,6 +9,8 @@ using PPKBeverageManagement.Models;
 using System.IO;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
+using PPKBeverageManagement.ViewModels;
 
 namespace PPKBeverageManagement.Controllers
 {
@@ -302,8 +304,169 @@ namespace PPKBeverageManagement.Controllers
                 return View();
             }
         }
+        public ActionResult ListOrders()
+        {
+            var query = da.DonHangs.ToList(); ;
+            return View(query);
+        }
+
+        public ActionResult GetOrders(int id) 
+        { 
+            var query = da.DonHangs.Where(c => c.Id == id);
+            return View(query);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteOrder(int id)
+        {
+            var query = da.DonHangs.FirstOrDefault(s => s.Id == id );
+            da.DonHangs.Remove(query);
+            da.SaveChanges();
+            return RedirectToAction("ListBeverage");
+        }
+
+        public ActionResult ListDonHang(string? page)
+        {
+            if (!IsAdminLoggedIn())
+            {
+                return RedirectToAction("DangNhap");
+            }
+            string check = _httpContextAccessor.HttpContext.Session.GetString("UserName");
+            if (check != null)
+            {
+                TempData["IsLoggedIn"] = true;
+                ViewData["SuccessMessage"] = _httpContextAccessor.HttpContext.Session.GetString("SuccessMessage");
+
+                // Lấy tên người dùng từ session
+                var nameH = _httpContextAccessor.HttpContext.Session.GetString("HoQl");
+                var name = _httpContextAccessor.HttpContext.Session.GetString("TenQl");
+
+                if (!string.IsNullOrEmpty(nameH) && !string.IsNullOrEmpty(name))
+                {
+                    ViewData["FullName"] = $"{nameH} {name}";
+                }
+                else
+                {
+                    ViewData["FullName"] = "Quản Lý";
+                }
+                // Xóa thông báo từ session
+                var ds = da.DonHangs.ToList();
+                int pageSize = 4;
+                if (!string.IsNullOrEmpty(page))
+                {
+                    TempData["IsLoggedIn"] = true;
+
+                    int pageNumber = int.Parse(page);
+                    TempData["IsLoggedIn"] = true;
+
+                    ds = da.DonHangs
+                              .OrderBy(item => item.Id)
+                              .Skip((pageNumber - 1) * pageSize)//Lấy từ vị trí
+                              .Take(pageSize)//Lấy bao nhiêu
+                              .ToList();
+                    TempData["IsLoggedIn"] = true;
+                }
+                return View(ds);
+            }
+            else
+                return RedirectToAction("DangNhap");
+        }
+
+        public async Task<IActionResult> DonHangDetails(int? id)
+        {
+            if (!IsAdminLoggedIn())
+            {
+                return RedirectToAction("DangNhap");
+            }
+            TempData["IsLoggedIn"] = true;
+
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var donHang = await da.DonHangs
+                .Include(dh => dh.KhachHang)
+                .Include(dh => dh.ChiTietDonHangs)
+                    .ThenInclude(ctdh => ctdh.SanPham)
+                .Include(dh => dh.ChiTietDonHangs)
+                    .ThenInclude(ctdh => ctdh.KhuyenMai)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (donHang == null)
+            {
+                return NotFound();
+            }
+
+            // Kiểm tra nếu KhachHang là null
+            if (donHang.KhachHang == null)
+            {
+                // Xử lý khi KhachHang không có dữ liệu
+                // Ví dụ: bạn có thể hiển thị thông báo lỗi hoặc chuyển hướng đến trang khác
+                return RedirectToAction("ListDonHang"); // hoặc một hành động khác tùy thuộc vào logic của bạn
+            }
+
+            var viewModel = new DonHangDetailsViewModel
+            {
+                DonHangId = donHang.Id,
+                NgayTao = donHang.NgayTao,
+                PayPalKey = donHang.PayPalKey,
+                KhachHang = donHang.KhachHang,
+                ChiTietDonHangs = donHang.ChiTietDonHangs.ToList()
+            };
+
+            return View(viewModel);
+        }
+
+        // GET: CaPheController/Delete/5
+        public ActionResult DeleteDonHang(int id)
+        {
+            if (!IsAdminLoggedIn())
+            {
+                return RedirectToAction("DangNhap");
+            }
+            TempData["IsLoggedIn"] = true;
+            var p = da.DonHangs.FirstOrDefault(s => s.Id == id);
+            return View(p);
+        }
 
 
-       
+        // POST: CaPheController/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteDonHang(int id, IFormCollection collection)
+        {
+            try
+            {
+                if (!IsAdminLoggedIn())
+                {
+                    return RedirectToAction("DangNhap");
+                }
+                TempData["IsLoggedIn"] = true;
+
+                // Xóa tất cả các ChiTietDonHang liên quan đến DonHang
+                var chiTietDonHangs = da.ChiTietDonHangs.Where(ct => ct.DonHangId == id);
+                da.ChiTietDonHangs.RemoveRange(chiTietDonHangs);
+                da.SaveChanges();
+
+                // Sau đó, xóa DonHang
+                var dh = da.DonHangs.FirstOrDefault(s => s.Id == id);
+                da.DonHangs.Remove(dh);
+                da.SaveChanges();
+
+                return RedirectToAction("ListDonHang");
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
+
+
+
+
+
+
     }
 }
