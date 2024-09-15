@@ -68,6 +68,80 @@ namespace PPKBeverageManagement.Controllers
             string username = _httpContextAccessor.HttpContext.Session.GetString("UserName");
             return !string.IsNullOrEmpty(username) && username == "admin";
         }
+        // GET: AdminController
+        public ActionResult ThongKeTheoDoanhThu(DateTime? kw)
+        {
+            if (!IsAdminLoggedIn())
+            {
+                return RedirectToAction("DangNhap");
+            }
+            string check = _httpContextAccessor.HttpContext.Session.GetString("UserName");
+            if (check != null)
+            {
+                TempData["IsLoggedIn"] = true;
+                DateTime dateFilter = kw ?? DateTime.Today;
+
+                var result = da.ChiTietDonHangs.
+                    Include(ct => ct.SanPham)
+                    .ThenInclude(cp => cp.Size)
+                    .Where(ct => EF.Functions.DateDiffDay(ct.DonHang.NgayTao, dateFilter) == 0) // Lọc theo ngày tạo đơn hàng
+                    .GroupBy(ct => new { SanPhamTen = ct.SanPham.Ten, SizeTen = ct.SanPham.Size.Ten })
+                    .Select(g => new
+                    {
+                        SanPham = g.Key.SanPhamTen + " " + g.Key.SizeTen,
+                        DoanhThu = g.Sum(ct => ct.SoLuong * ct.Tien)
+                    })
+                    .ToList();
+                List<ThongKeTheoDoanhThuModel> ds = new List<ThongKeTheoDoanhThuModel>();
+                foreach (var item in result)
+                {
+                    ThongKeTheoDoanhThuModel a = new ThongKeTheoDoanhThuModel();
+                    a.Ten = item.SanPham;
+                    a.DoanhThu = (decimal)item.DoanhThu;
+                    ds.Add(a);
+                }
+                return View(ds);
+            }
+            else
+                return RedirectToAction("DangNhap");
+        }
+
+        // GET: AdminController/Details/5
+        public ActionResult ThongKeTheoSoLuongSanPham(DateTime? kw)
+        {
+            if (!IsAdminLoggedIn())
+            {
+                return RedirectToAction("DangNhap");
+            }
+            string check = _httpContextAccessor.HttpContext.Session.GetString("UserName");
+            if (check != null)
+            {
+                TempData["IsLoggedIn"] = true;
+                DateTime dateFilter = kw ?? DateTime.Today;
+                var result = da.ChiTietDonHangs
+                    .Include(ct => ct.SanPham)
+                    .ThenInclude(cp => cp.Size)
+                    .Where(ct => EF.Functions.DateDiffDay(ct.DonHang.NgayTao, dateFilter) == 0) // Lọc theo ngày tạo đơn hàng
+                    .GroupBy(ct => new { SanPhamTen = ct.SanPham.Ten, SizeTen = ct.SanPham.Size.Ten })
+                    .Select(g => new
+                    {
+                        SanPham = g.Key.SanPhamTen + " " + g.Key.SizeTen,
+                        SoLuongBanDuoc = g.Count() // Sử dụng hàm Count() để đếm số lượng sản phẩm
+                    }).ToList();
+                List<ThongKeSoLuongSanPhamModel> ds = new List<ThongKeSoLuongSanPhamModel>();
+                foreach (var item in result)
+                {
+                    Console.WriteLine($"SanPham: {item.SanPham}, SoLuongBanDuoc: {item.SoLuongBanDuoc}");
+                    ThongKeSoLuongSanPhamModel a = new ThongKeSoLuongSanPhamModel();
+                    a.TenSanPham = item.SanPham;
+                    a.SoLuong = (int)item.SoLuongBanDuoc;
+                    ds.Add(a);
+                }
+                return View(ds);
+            }
+            else
+                return RedirectToAction("DangNhap");
+        }
         public ActionResult DangNhap()
         {
             return View();
