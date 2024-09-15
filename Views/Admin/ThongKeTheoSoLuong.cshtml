@@ -54,5 +54,20 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src=""></script>
+<script src="/js/JavaScript.js"></script>
+<script>
+    let labels = [];
+    let data = [];
+    @foreach (var item in Model)
+    {
+        <text>
+            labels.push("@item.TenSanPham");
+        data.push(@item.SoLuong);
+        </text>
+    }
+        window.onload = function () {
+            let ctx1 = document.getElementById("myChart").getContext('2d');
+            drawChartTheoSoLuong(ctx1, labels, data, "THỐNG KÊ SỐ LƯỢNG SẢN PHẨM BÁN");
+        }
+</script>
 

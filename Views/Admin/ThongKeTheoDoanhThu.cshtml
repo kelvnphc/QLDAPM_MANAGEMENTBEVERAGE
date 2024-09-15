@@ -48,7 +48,22 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src=""></script>
+<script src="/js/JavaScript.js"></script>
+<script>
+    let labels = [];
+    let data = [];
+    @foreach (var item in Model)
+    {
+        <text>
+            labels.push("@item.Ten");
+        data.push(@item.DoanhThu);
+        </text>
+    }
+        window.onload = function () {
+            let ctx1 = document.getElementById("myChart").getContext('2d');
+            drawChartTheoSoLuong(ctx1, labels, data, "THỐNG KÊ DOANH THU SẢN PHẨM BÁN");
+        }
+</script>
 
 
 <style>
